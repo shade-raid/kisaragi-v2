@@ -1,0 +1,1222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>きさらぎ駅 / Kisaragi Station</title>
+<style>
+body {
+  font-family: "MS Gothic", "ＭＳ ゴシック", "IPAGothic", "Osaka-Mono", monospace, sans-serif;
+  font-size: 14px;
+  background-color: #f0ece0;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── SPLASH ── */
+#splash {
+  position: fixed; inset: 0;
+  background: #c8c0a8;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 999;
+  text-align: center;
+  gap: 10px;
+  border: 4px inset #999;
+}
+#splash.hidden { display: none; }
+
+.splash-jp {
+  font-family: "MS Mincho","ＭＳ 明朝","IPAMincho", serif;
+  font-size: 48px; color: #222;
+  letter-spacing: 12px;
+  text-shadow: 2px 2px 0 #888;
+}
+.splash-en {
+  font-size: 13px; color: #555;
+  letter-spacing: 3px;
+  font-family: "Courier New", monospace;
+}
+.splash-rule {
+  width: 300px; border: none;
+  border-top: 1px solid #999; margin: 2px 0;
+}
+.splash-date {
+  font-size: 11px; color: #777;
+  font-family: "Courier New", monospace;
+  letter-spacing: 2px;
+}
+
+/* Language picker */
+.lang-pick-label {
+  font-size: 12px; color: #555;
+  margin-top: 10px;
+  font-family: "Courier New", monospace;
+  letter-spacing: 1px;
+}
+.lang-btns {
+  display: flex; gap: 12px;
+  margin-top: 4px;
+}
+.lang-btn {
+  background: #e0d8c8;
+  border: 2px outset #fff;
+  font-family: "MS Gothic", monospace;
+  font-size: 14px;
+  padding: 6px 22px;
+  cursor: pointer; color: #222;
+  letter-spacing: 2px;
+  transition: background .1s;
+}
+.lang-btn:active { border: 2px inset #fff; }
+.lang-btn:hover  { background: #d0c8b8; }
+.lang-btn.selected {
+  background: #800000;
+  color: #fff;
+  border: 2px inset #600;
+}
+.splash-note {
+  font-size: 10px; color: #888;
+  font-family: "Courier New", monospace;
+  line-height: 1.8; margin-top: 4px;
+}
+#start-btn {
+  margin-top: 8px;
+  background: #c8c0a8;
+  border: 2px outset #fff;
+  font-family: "MS Gothic", monospace;
+  font-size: 13px; padding: 5px 28px;
+  cursor: pointer; color: #222;
+  letter-spacing: 1px;
+}
+#start-btn:active { border: 2px inset #fff; }
+
+/* ── SITE HEADER ── */
+#site-header {
+  background: #800000; color: #fff;
+  padding: 2px 8px; font-size: 11px;
+  display: none;
+  justify-content: space-between; align-items: center;
+  border-bottom: 1px solid #600;
+}
+#site-header.show { display: flex; }
+.site-logo { font-weight: bold; font-size: 13px; letter-spacing: 2px; }
+.site-nav a { color: #ffc; font-size: 10px; text-decoration: none; margin-left: 8px; }
+.site-nav a:hover { text-decoration: underline; }
+
+/* ── BOARD HEADER ── */
+#board-header {
+  background: #666655; color: #fff;
+  padding: 3px 8px; font-size: 11px;
+  display: none;
+  align-items: center; gap: 6px;
+  border-bottom: 1px solid #444;
+}
+#board-header.show { display: flex; }
+.board-name { font-weight: bold; font-size: 12px; }
+
+/* ── THREAD HEADER ── */
+#thread-header {
+  background: #ded8c8;
+  border-bottom: 1px solid #bbb;
+  border-top: 1px solid #fff;
+  padding: 4px 8px;
+  display: none; font-size: 12px; color: #333;
+}
+#thread-header.show { display: block; }
+.thread-title-row {
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 4px;
+}
+.thread-name { font-weight: bold; font-size: 13px; color: #006; }
+#post-count-display { font-size: 11px; color: #666; }
+#live-indicator {
+  display: inline-block; font-size: 10px;
+  color: #060; border: 1px solid #090;
+  padding: 0 4px; background: #e8ffe8;
+}
+#live-indicator.dead {
+  color: #600; border-color: #900; background: #ffe8e8;
+}
+
+/* ── THREAD BODY ── */
+#thread-wrap {
+  max-width: 860px; margin: 0 auto;
+  display: none; flex-direction: column;
+  padding-bottom: 130px;
+}
+#thread-wrap.show { display: flex; }
+
+/* ── POSTS ── */
+.post-block {
+  border-bottom: 1px dotted #bbb;
+  padding: 5px 8px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0 8px;
+  font-size: 13px;
+  background: #faf8f2;
+}
+.post-block:nth-child(even) { background: #f4f0e4; }
+.post-block.hasumi-post { background: #e8f0f8; }
+.post-block.hasumi-post:nth-child(even) { background: #dde8f4; }
+.post-block.you-post { background: #fffff0; }
+.post-block.you-post:nth-child(even) { background: #fffae0; }
+.post-block.panic-post { background: #fff0f0; }
+.post-block.panic-post:nth-child(even) { background: #ffe8e8; }
+.post-block.narration-block {
+  grid-template-columns: 1fr;
+  background: transparent; border: none;
+  border-left: 3px solid #bbb;
+  margin: 2px 8px; padding: 3px 8px;
+  font-size: 11px; color: #777; font-style: italic;
+}
+.post-block.system-block {
+  grid-template-columns: 1fr;
+  background: #e8e0d0; border: 1px solid #bbb;
+  text-align: center; font-size: 11px; color: #555;
+  margin: 4px;
+}
+
+.post-meta { padding-top: 1px; }
+.post-num-link {
+  color: #006; font-size: 12px;
+  text-decoration: none; font-weight: bold;
+}
+.post-num-link:hover { text-decoration: underline; }
+.poster-name { font-weight: bold; font-size: 13px; }
+.poster-name.hasumi { color: #036; }
+.poster-name.anon   { color: #333; }
+.poster-name.you    { color: #630; }
+.poster-name.panic  { color: #900; }
+.poster-name.sys    { color: #666; }
+.poster-mail { color: #00c; font-size: 11px; font-style: italic; }
+.poster-id   { color: #888; font-size: 10px; }
+.poster-time { color: #666; font-size: 11px; display: block; margin-top: 1px; }
+.you-label {
+  display: inline-block; font-size: 9px;
+  background: #ffc; border: 1px solid #cc9;
+  padding: 0 3px; color: #630; margin-top: 2px;
+}
+
+.post-body {
+  padding-top: 2px; line-height: 1.65;
+  word-break: break-word;
+}
+.post-body .ref  { color: #00c; }
+.post-body .red  { color: #900; font-weight: bold; }
+.post-body .em   { color: #006; }
+.post-body .warn { color: #c30; font-weight: bold; }
+
+/* ── TYPING / SILENCE ── */
+#typing-row {
+  padding: 4px 8px; background: #e8f0f8;
+  border-bottom: 1px dotted #bbb;
+  font-size: 11px; color: #036; display: none;
+}
+#typing-row.show { display: block; }
+.dot1 { animation: d1 1.5s infinite; }
+.dot2 { animation: d1 1.5s .3s infinite; }
+.dot3 { animation: d1 1.5s .6s infinite; }
+@keyframes d1 { 0%,100%{opacity:.2;} 50%{opacity:1;} }
+
+#silence-row {
+  padding: 3px 8px; background: #fff0f0;
+  border-bottom: 1px dotted #daa;
+  font-size: 11px; color: #900;
+  display: none; text-align: center;
+}
+#silence-row.show { display: block; }
+
+/* ── CHOICE BOX ── */
+#choice-box {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #ded8c8;
+  border-top: 2px solid #999;
+  padding: 6px 8px; z-index: 100;
+}
+#choice-box.show { display: block; }
+
+.choice-header {
+  font-size: 11px; color: #555;
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.choice-anon { font-weight: bold; color: #630; }
+.choice-buttons { display: flex; flex-direction: column; gap: 3px; }
+
+.cbtn {
+  background: #f0ece0;
+  border: 1px solid #999;
+  border-top-color: #fff; border-left-color: #fff;
+  border-bottom-color: #666; border-right-color: #666;
+  font-family: "MS Gothic", monospace, sans-serif;
+  font-size: 12px; padding: 3px 8px;
+  text-align: left; cursor: pointer;
+  color: #222; line-height: 1.5;
+}
+.cbtn:hover { background: #e0e8f0; }
+.cbtn:active {
+  border-top-color: #666; border-left-color: #666;
+  border-bottom-color: #fff; border-right-color: #fff;
+}
+.cbtn.sage   { color: #777; }
+.cbtn.red-opt { color: #900; }
+
+/* ── ENDING ── */
+.ending-block {
+  background: #ded8c8; border: 2px inset #999;
+  margin: 16px 8px; padding: 20px; text-align: center;
+  font-family: "MS Mincho","ＭＳ 明朝",serif;
+}
+.ending-type {
+  font-size: 11px; letter-spacing: 4px; color: #666;
+  margin-bottom: 8px; font-family: "Courier New", monospace;
+}
+.ending-jp { font-size: 28px; color: #333; letter-spacing: 4px; margin-bottom: 12px; }
+.ending-text {
+  font-size: 12px; line-height: 1.85; color: #555;
+  max-width: 480px; margin: 0 auto 10px;
+  font-family: "MS Gothic", monospace; text-align: left;
+}
+.ending-note {
+  font-size: 11px; color: #888; font-style: italic;
+  margin: 10px auto; max-width: 380px;
+  white-space: pre-line; line-height: 1.9;
+}
+.ending-rule { border-top: 1px dotted #999; margin: 12px auto; width: 200px; }
+.restart-btn {
+  background: #c8c0a8; border: 2px outset #fff;
+  font-family: "MS Gothic", monospace;
+  font-size: 12px; padding: 4px 20px;
+  cursor: pointer; color: #333;
+}
+.restart-btn:active { border: 2px inset #fff; }
+
+.board-footer {
+  text-align: center; font-size: 10px; color: #888;
+  padding: 8px; border-top: 1px solid #ccc;
+  margin-top: 8px; display: none;
+}
+.board-footer.show { display: block; }
+
+@media(max-width:600px){
+  .post-block { grid-template-columns: 120px 1fr; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-jp">きさらぎ駅</div>
+  <hr class="splash-rule">
+  <div class="splash-en">KISARAGI STATION</div>
+  <div class="splash-date">2ch.net — 2004/01/08(木) — オカルト板</div>
+  <hr class="splash-rule">
+
+  <div class="lang-pick-label">言語を選んでください / Choose your language</div>
+  <div class="lang-btns">
+    <button class="lang-btn" id="btn-ja" onclick="selectLang('ja')">日本語</button>
+    <button class="lang-btn" id="btn-en" onclick="selectLang('en')">English</button>
+  </div>
+
+  <div class="splash-note" id="splash-note-text">
+    あなたは名無しさん。はすみを助けることはできない。ただ、そこにいることができる。<br>
+    You are Anonymous. You cannot save her. You can only stay.
+  </div>
+  <button id="start-btn" onclick="beginGame()" disabled style="opacity:.5;cursor:default;">
+    <span id="start-btn-text">言語を選んでください / Select a language</span>
+  </button>
+</div>
+
+<!-- SITE HEADER -->
+<div id="site-header">
+  <span class="site-logo" id="hdr-logo">２ちゃんねる</span>
+  <span class="site-nav">
+    <a href="#" id="hdr-board">オカルト</a>
+    <a href="#">[スレ一覧]</a>
+    <a href="#">[書き込む]</a>
+  </span>
+</div>
+
+<!-- BOARD HEADER -->
+<div id="board-header">
+  <span class="board-name" id="hdr-boardname">オカルト板</span>
+  <span>▷</span>
+  <span id="hdr-threadcat">不思議な体験をした事がある方</span>
+  <span>▷</span>
+  <span>Thread 26</span>
+</div>
+
+<!-- THREAD HEADER -->
+<div id="thread-header">
+  <div class="thread-title-row">
+    <span class="thread-name" id="hdr-threadname">不思議な体験をした事がある方２６</span>
+    <span>
+      <span id="post-count-display">レス数: 0</span>&nbsp;
+      <span id="live-indicator">● LIVE</span>
+    </span>
+  </div>
+</div>
+
+<!-- THREAD BODY -->
+<div id="thread-wrap">
+  <div id="thread"></div>
+  <div id="typing-row">
+    <span id="typing-text">Hasumi が書き込み中</span>
+    <span class="dot1">●</span><span class="dot2">●</span><span class="dot3">●</span>
+  </div>
+  <div id="silence-row">
+    <span id="silence-label">■ Hasumi からの最後の書き込み:</span>
+    <span id="silence-clock">0:00</span>
+    <span id="silence-suffix">前</span>
+  </div>
+  <div class="board-footer" id="board-footer" id="board-footer-text">
+    レス数が1000を超えました。もうすぐ書けなくなります。<br>
+    <small>2ch.net ― このスレッドはアーカイブされました</small>
+  </div>
+</div>
+
+<!-- CHOICE BOX -->
+<div id="choice-box">
+  <div class="choice-header">
+    <span class="choice-anon" id="choice-anon-label">名無しさん</span>
+    <span id="choice-num" style="color:#888;font-size:10px;">#000</span>
+    <span style="flex:1"></span>
+    <span style="font-size:10px;color:#888;" id="choice-reply-label">返信する</span>
+  </div>
+  <div class="choice-buttons" id="choices-list"></div>
+</div>
+
+<script>
+// ── LANGUAGE ──────────────────────────────────────
+var lang = null; // 'ja' or 'en'
+
+function t(ja, en) { return lang === 'ja' ? ja : en; }
+
+function selectLang(l) {
+  lang = l;
+  document.getElementById('btn-ja').classList.toggle('selected', l === 'ja');
+  document.getElementById('btn-en').classList.toggle('selected', l === 'en');
+
+  var btn = document.getElementById('start-btn');
+  var btnText = document.getElementById('start-btn-text');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+
+  if (l === 'ja') {
+    btnText.textContent = 'スレッドに入る';
+    document.getElementById('splash-note-text').textContent =
+      'あなたは名無しさん。はすみを助けることはできない。ただ、そこにいることができる。';
+  } else {
+    btnText.textContent = 'Enter Thread';
+    document.getElementById('splash-note-text').textContent =
+      'You are Anonymous. You cannot save her. You can only stay.';
+  }
+}
+
+function applyLangChrome() {
+  if (lang === 'ja') {
+    document.getElementById('hdr-logo').textContent = '２ちゃんねる';
+    document.getElementById('hdr-board').textContent = 'オカルト';
+    document.getElementById('hdr-boardname').textContent = 'オカルト板';
+    document.getElementById('hdr-threadcat').textContent = '不思議な体験をした事がある方';
+    document.getElementById('hdr-threadname').textContent = '不思議な体験をした事がある方２６';
+    document.getElementById('typing-text').textContent = 'Hasumi が書き込み中';
+    document.getElementById('silence-label').textContent = '■ Hasumi からの最後の書き込み:';
+    document.getElementById('silence-suffix').textContent = '前';
+    document.getElementById('live-indicator').textContent = '● LIVE';
+    document.getElementById('choice-anon-label').textContent = '名無しさん';
+    document.getElementById('choice-reply-label').textContent = '返信する';
+    document.getElementById('board-footer').innerHTML =
+      'レス数が1000を超えました。もうすぐ書けなくなります。<br><small>2ch.net ― このスレッドはアーカイブされました</small>';
+  } else {
+    document.getElementById('hdr-logo').textContent = '2ch.net';
+    document.getElementById('hdr-board').textContent = 'Occult';
+    document.getElementById('hdr-boardname').textContent = 'Occult Board';
+    document.getElementById('hdr-threadcat').textContent = 'Post About Strange Occurrences';
+    document.getElementById('hdr-threadname').textContent = 'Post About Strange Occurrences Around You — Thread 26';
+    document.getElementById('typing-text').textContent = 'Hasumi is typing';
+    document.getElementById('silence-label').textContent = '■ Last post from Hasumi:';
+    document.getElementById('silence-suffix').textContent = 'ago';
+    document.getElementById('live-indicator').textContent = '● LIVE';
+    document.getElementById('choice-anon-label').textContent = 'Anonymous';
+    document.getElementById('choice-reply-label').textContent = 'Post Reply';
+    document.getElementById('board-footer').innerHTML =
+      'This thread has exceeded 1000 replies and will soon be locked.<br><small>2ch.net — This thread has been archived.</small>';
+  }
+}
+
+// ── STATE ─────────────────────────────────────────
+var PLAYER_NUM = 300 + Math.floor(Math.random() * 200);
+var bond = 3;
+var postCount = 0;
+var clock = { h:23, m:40, s:0 };
+var silInterval = null;
+
+function tickClock(sec) {
+  clock.s += sec;
+  while(clock.s>=60){clock.s-=60;clock.m++;}
+  while(clock.m>=60){clock.m-=60;clock.h++;}
+  if(clock.h>=24)clock.h-=24;
+  return p2(clock.h)+':'+p2(clock.m)+':'+p2(clock.s);
+}
+function p2(n){ return String(n).padStart(2,'0'); }
+
+function fakeDate(ts) {
+  return lang==='ja' ? '04/01/08(木)'+ts : '04/01/08 (Thu) '+ts;
+}
+function fakeID(){ return Math.random().toString(36).slice(2,10); }
+
+// ── UTILS ─────────────────────────────────────────
+function wait(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
+
+async function typewrite(el, html, speed) {
+  speed = speed || 22;
+  var out='', i=0;
+  el.innerHTML='';
+  while(i<html.length){
+    if(html[i]==='<'){
+      var end=html.indexOf('>',i);
+      if(end!==-1){out+=html.slice(i,end+1);i=end+1;el.innerHTML=out;await wait(speed*2);continue;}
+    }
+    out+=html[i++];
+    el.innerHTML=out;
+    await wait(speed);
+  }
+}
+
+function scrollDown(){ window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); }
+function updateCount(){
+  var lbl = lang==='ja' ? 'レス数: ' : 'Replies: ';
+  document.getElementById('post-count-display').textContent = lbl + postCount;
+}
+
+// ── POST FACTORY ──────────────────────────────────
+async function addPost(opts) {
+  await wait(opts.delay||0);
+  var ts = tickClock(Math.floor(Math.random()*70+20));
+  postCount++;
+  updateCount();
+
+  var thread = document.getElementById('thread');
+  var el = document.createElement('div');
+
+  if(opts.type==='narration'){
+    el.className='post-block narration-block';
+    el.innerHTML='<div class="post-body">'+opts.body+'</div>';
+    thread.appendChild(el); scrollDown(); return el;
+  }
+  if(opts.type==='system'){
+    el.className='post-block system-block';
+    el.innerHTML='<div class="post-body">'+opts.body+'</div>';
+    thread.appendChild(el); scrollDown(); return el;
+  }
+
+  var cls='post-block';
+  if(opts.type==='hasumi') cls+=' hasumi-post';
+  else if(opts.isYou)      cls+=' you-post';
+  else if(opts.type==='panic') cls+=' panic-post';
+  el.className=cls;
+
+  var nc = opts.type==='hasumi'?'hasumi':opts.isYou?'you':opts.type==='panic'?'panic':'anon';
+  var dn = opts.name||(opts.type==='hasumi'?'Hasumi':opts.isYou?t('名無しさん','Anonymous'):t('名無しさん','Anonymous'));
+  var badge = opts.isYou?'<span class="you-label">'+t('あなた','YOU')+'</span>':'';
+
+  el.innerHTML=
+    '<div class="post-meta">'+
+      '<a class="post-num-link" href="#">'+postCount+'</a>　'+
+      '<span class="poster-name '+nc+'">'+dn+'</span>'+
+      '<span class="poster-time">'+fakeDate(ts)+'</span>'+
+      '<span class="poster-id">ID:'+fakeID()+'</span>'+
+      badge+
+    '</div>'+
+    '<div class="post-body">'+(opts.doType?'':opts.body)+'</div>';
+
+  thread.appendChild(el); scrollDown();
+
+  if(opts.doType){
+    await typewrite(el.querySelector('.post-body'), opts.body, 22);
+    scrollDown();
+  }
+  return el;
+}
+
+// ── SHORTCUTS ─────────────────────────────────────
+// H(ja, en, typingMs)  — Hasumi posts
+async function H(ja, en, typingMs) {
+  typingMs = typingMs||5000;
+  showTyping(true);
+  await wait(typingMs);
+  showTyping(false);
+  await addPost({type:'hasumi', body:t(ja,en), doType:true});
+}
+
+// A(ja, en, delay)  — random anon posts
+async function A(ja, en, delay) {
+  await addPost({type:'anon', body:t(ja,en), delay:delay||800});
+}
+
+// Y(ja, en)  — player's post
+async function Y(ja, en) {
+  await addPost({type:'anon', isYou:true, body:t(ja,en), delay:100});
+}
+
+// P(ja, en, delay)  — panic posts
+async function P(ja, en, delay) {
+  await addPost({type:'panic', body:t(ja,en), delay:delay||1500});
+}
+
+// N(ja, en, delay)  — narration
+async function N(ja, en, delay) {
+  await wait(delay||0);
+  await addPost({type:'narration', body:t(ja,en)});
+}
+
+// SYS(ja, en)  — system post
+async function SYS(ja, en) {
+  await addPost({type:'system', body:t(ja,en), delay:400});
+}
+
+// ── TYPING / SILENCE ──────────────────────────────
+function showTyping(show){
+  var el=document.getElementById('typing-row');
+  if(show){el.classList.add('show');scrollDown();}
+  else el.classList.remove('show');
+}
+
+function startSilence(){
+  var bar=document.getElementById('silence-row');
+  var clk=document.getElementById('silence-clock');
+  bar.classList.add('show');
+  var start=Date.now();
+  silInterval=setInterval(function(){
+    var s=Math.floor((Date.now()-start)/1000);
+    clk.textContent=Math.floor(s/60)+':'+p2(s%60);
+  },500);
+}
+function stopSilence(){
+  clearInterval(silInterval);
+  document.getElementById('silence-row').classList.remove('show');
+}
+
+// ── CHOICE ────────────────────────────────────────
+function ask(options){
+  return new Promise(function(resolve){
+    var box=document.getElementById('choice-box');
+    var list=document.getElementById('choices-list');
+    document.getElementById('choice-num').textContent='#'+PLAYER_NUM;
+    list.innerHTML='';
+    options.forEach(function(opt){
+      var btn=document.createElement('button');
+      btn.className='cbtn'+(opt.silent?' sage':'')+(opt.danger?' red-opt':'');
+      btn.textContent = opt.silent
+        ? t('[ sage ]  (何も書かない)','[ sage ]  (say nothing)')
+        : t(opt.ja, opt.en);
+      btn.onclick=async function(){
+        box.classList.remove('show');
+        list.innerHTML='';
+        if(!opt.silent) await Y(opt.ja, opt.en);
+        else await wait(200);
+        bond=Math.max(0,Math.min(10,bond+(opt.bond||0)));
+        resolve(opt);
+      };
+      list.appendChild(btn);
+    });
+    box.classList.add('show');
+    scrollDown();
+  });
+}
+
+// ── ENDING ────────────────────────────────────────
+async function showEnding(opts){
+  document.getElementById('live-indicator').textContent=
+    lang==='ja'?'● アーカイブ済み':'● ARCHIVED';
+  document.getElementById('live-indicator').classList.add('dead');
+  stopSilence();
+
+  var thread=document.getElementById('thread');
+  await wait(1500);
+  var el=document.createElement('div');
+  el.className='ending-block';
+
+  var label;
+  if(opts.type==='bad')  label=t('バッドエンド','BAD ENDING');
+  else if(opts.type==='true') label=t('トゥルーエンド','TRUE ENDING');
+  else                   label=t('エンディング','ENDING');
+
+  el.innerHTML=
+    '<div class="ending-type">'+label+'</div>'+
+    '<div class="ending-jp">'+t(opts.jp_ja, opts.jp_en)+'</div>'+
+    '<hr class="ending-rule">'+
+    '<div class="ending-text">'+t(opts.text_ja, opts.text_en)+'</div>'+
+    '<div class="ending-note">'+t(opts.note_ja, opts.note_en)+'</div>'+
+    '<hr class="ending-rule">'+
+    '<button class="restart-btn" onclick="restart()">'+
+      t('もう一度スレッドを読む','Read the thread again')+
+    '</button>';
+
+  thread.appendChild(el);
+  document.getElementById('board-footer').classList.add('show');
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ── RESTART ───────────────────────────────────────
+function restart(){
+  bond=3; postCount=0; clock={h:23,m:40,s:0};
+  document.getElementById('thread').innerHTML='';
+  document.getElementById('choices-list').innerHTML='';
+  document.getElementById('choice-box').classList.remove('show');
+  showTyping(false); stopSilence();
+  document.getElementById('live-indicator').textContent='● LIVE';
+  document.getElementById('live-indicator').classList.remove('dead');
+  document.getElementById('board-footer').classList.remove('show');
+  updateCount();
+  story();
+}
+
+// ── BEGIN ──────────────────────────────────────────
+function beginGame(){
+  if(!lang) return;
+  document.getElementById('splash').classList.add('hidden');
+  applyLangChrome();
+  document.getElementById('site-header').classList.add('show');
+  document.getElementById('board-header').classList.add('show');
+  document.getElementById('thread-header').classList.add('show');
+  document.getElementById('thread-wrap').classList.add('show');
+  updateCount();
+  story();
+}
+
+// ══════════════════════════════════════════════════
+// ── STORY ─────────────────────────────────────────
+// ══════════════════════════════════════════════════
+async function story(){
+
+  await SYS(
+    '【オカルト板】不思議な体験をした事がある方２６【雑談】不思議な体験や怖い話はこちらへ。',
+    'Occult Board — Post About Strange Occurrences Around You — Thread 26. Share strange experiences here. Keep it civil.'
+  );
+  await N(
+    '2004年1月8日（木）23時40分。深夜の２ちゃんねるオカルト板。あなたは名無しさんのひとり。',
+    'January 8, 2004 (Thursday). 11:40 PM. You are one of many anonymous users in a late-night 2channel occult thread.'
+  );
+
+  // ── BEAT 1 ──
+  await H(
+    'いつも乗る電車で帰宅中なのですが、もう20分近く駅に停まっていません。普段は5〜7分で次の駅に着くのに。他の乗客は5人いますが全員寝ています。何かおかしいですか？',
+    "I'm on my usual train home from work, but it hasn't stopped at any station for almost 20 minutes. Normally it's only 5 or 7 minutes between stops. There are 5 other passengers but they're all sleeping. Is something wrong?",
+    1200
+  );
+
+  await A('居眠りして乗り過ごしたんじゃないの','You probably just dozed off and missed your stop lol',700);
+  await A('何線？スマホの地図で確認して','What line are you on? Check your phone map',1300);
+  await A('車両の端に車掌呼び出しインターホンあるはず、それ押して','There should be an intercom button at the end of the car — try pressing it',1900);
+
+  var c1 = await ask([
+    {ja:'乗ったのはどこの駅？時間は？正確に。これ重要。',    en:"What station did you board at? What time exactly? Be specific — it matters.",       bond:+1},
+    {ja:'夜の電車はたまに遅れる。まずインターホンを試して。', en:"Night trains get delayed sometimes. Try the intercom button first.",                 bond:0},
+    {silent:true, bond:-1}
+  ]);
+
+  await A('まだいる？','Still there?',1000);
+  await A('たぶん大丈夫だよ','Probably nothing, right?',1700);
+
+  // ── BEAT 2 ──
+  var extra = (bond>=4&&!c1.silent)
+    ? t('<span class="ref">&gt;&gt;'+PLAYER_NUM+'</span> ありがとう、落ち着いて考えます。',
+        '<span class="ref">&gt;&gt;'+PLAYER_NUM+'</span> Thank you, that helps me focus. ')
+    : '';
+  await H(
+    extra+'新浜松駅です。遠州鉄道。乗ったのは23時40分で今は00時02分。寝ていません、確かめました。窓の外は真っ暗で、建物も灯りも何も見えません。',
+    extra+"Shin-Hamamatsu station. Enshū Railway. I boarded at 23:40 and it's now 00:02. I haven't slept — I'm certain. Outside the window is just dark. No buildings, no lights anywhere.",
+    5500
+  );
+
+  await A('遠州鉄道!? あんな小さい路線に20分走れる区間なんてない','Enshū Railway?? That\'s a tiny local line. There\'s no stretch that long on it.',700);
+  await A('時刻表確認した——終電は深夜0時まで。これ絶対おかしい','Just checked the timetable — last train runs until midnight. Something is very wrong.',1400);
+  await A('<span class="warn">今すぐ車掌室のドアをノックして！！</span>','<span class="warn">Knock on the conductor door RIGHT NOW!!</span>',2100);
+
+  var c2 = await ask([
+    {ja:'今すぐ車掌室のドアをノックして。待ってはダメ。',  en:"Go knock on the conductor door right now. Don't wait.",                           bond:+1},
+    {ja:'まず鉄道の緊急番号に電話して。車内に掲示してあるはず。', en:"Try calling the railway emergency number first. Should be posted in the car.",   bond:+1},
+    {ja:'他の乗客をよく見て。本当に寝てるだけ？',          en:"Look carefully at the other passengers. Are you sure they're just sleeping?",        bond:0}
+  ]);
+
+  // ── BEAT 3 ──
+  await H(
+    '車掌室の窓をノックしました。ブラインドが下りています。強くノックしても全く反応なし。電車は動いているのに誰も応答しません。',
+    "I knocked on the conductor's window. The blinds are down. No answer no matter how hard I knocked. The train is moving but nobody responds at all.",
+    6000
+  );
+
+  await A('全く反応なし……','No answer at all......',500);
+  await A('怖い','This is actually really scary',900);
+  await A('遠州鉄道は全長17.8kmしかない。20分以上走ってたら終点をとっくに過ぎてる','The Enshū line is only 17.8km total. 20+ minutes means she\'s way past the last station.',2100);
+
+  await wait(3500);
+
+  // ── BEAT 4: KISARAGI ──
+  await H('あ。電車がゆっくりになってきました。','Oh. The train is slowing down.',3500);
+  await wait(1800);
+  await H('ホームがあります。駅の看板が見えます。ドアが開きました。','There\'s a platform. I can see a station sign. The doors are opening.',2000);
+  await wait(2000);
+  await H(
+    '看板には…… <span class="red">「きさらぎ駅」</span> と書いてあります。きさらぎ駅なんて聞いたことない。降りた方がいいですか？',
+    'The sign says... <span class="red">KISARAGI STATION</span>. I\'ve never heard of Kisaragi Station. Should I get off? What do I do?',
+    2500
+  );
+
+  await A('<span class="warn">降りるな！！</span>','<span class="warn">DON\'T GET OFF!!</span>',400);
+  await A('電車が動き出すまで絶対に降りるな','Wait for the train to continue — do NOT leave the car',800);
+  await A('今調べた——遠州鉄道に「きさらぎ駅」は存在しない','Just searched — there is NO Kisaragi Station anywhere on the Enshū line',1200);
+  await A('<span class="warn">日本全国どこにも「きさらぎ駅」なんて存在しない！！！</span>','<span class="warn">There is NO Kisaragi Station ANYWHERE IN JAPAN!!</span>',1600);
+  await A('はすみさん乗ったままで！！','HASUMI STAY ON THE TRAIN!!',2000);
+  await A('「如月」の漢字には「鬼」の字が入る。マジで言ってる。','The kanji for "kisaragi" 如月 contains the character for oni 鬼. For demon. I\'m serious.',2600);
+
+  var c3 = await ask([
+    {ja:'絶対に乗ったままで。何があっても降りないで。',  en:"STAY ON THE TRAIN. Do NOT step off under any circumstances.",  bond:+1, danger:true},
+    {ja:'慎重に降りて看板を全部読んで。周囲を教えて。', en:"Step off carefully and read the full sign. Tell us everything you see.", bond:0},
+    {silent:true, bond:-1}
+  ]);
+
+  var sheStays = (c3.danger && bond>=5);
+  if(sheStays){ await pathStayedOn(); }
+  else {
+    if(c3.danger){
+      await H(
+        '——わかった、でも看板だけ確認します。すぐ戻ります。',
+        "I— okay, but I'm just going to check the sign real quick. I'll get back on before it leaves.",
+        3000
+      );
+    }
+    await pathGotOff();
+  }
+}
+
+// ══════════════════════════════════════════════════
+// ── PATH A: STAYED ON (Bad Ending) ────────────────
+// ══════════════════════════════════════════════════
+async function pathStayedOn(){
+  await H('わかりました。乗ったままにします。あなたたちが正しいと思う。','Okay. Staying on. I think you\'re right.',2500);
+  await A('よかった','Good',800);
+  await A('賢い判断','Smart call. The train will continue.',1400);
+  await N('スレッドが静かになる。8秒経過。12秒。','The thread goes quiet. Eight seconds pass. Twelve.',2000);
+
+  await wait(8000);
+
+  await H('また動き出しました。よかった、たぶん——','We\'re moving again. Good. I think—',3500);
+
+  showTyping(true);
+  await wait(4000);
+  await wait(5000);
+  showTyping(false);
+
+  startSilence();
+
+  await A('はすみさん？','Hasumi?',1500);
+  await A('まだいる？','Still there?',2500);
+  await P('はすみ！！','HASUMI!!',3500);
+  await P('はすみ！！返事して！！','HASUMI ANSWER US!!',5000);
+  await P('さっき何か言いかけてたよな……','She was typing and then she just... stopped',6500);
+  await P('はすみさん大丈夫ですか','Hasumi are you okay',8500);
+  await P('……','......',11000);
+  await P('打ってたのに突然止まった','She was in the middle of a sentence',13000);
+  await P('スレ死んだ','Thread is dead',16000);
+
+  await showEnding({
+    type:'bad',
+    jp_ja:'終電', jp_en:'Last Train',
+    text_ja:'はすみの最後のメッセージは送信されなかった。入力中の表示は0時41分に消えた。スレッドの住人は4時間書き込み続けた。はすみのアカウントは二度とログインしなかった。遠州鉄道に2004年1月8日の異常に関する記録は存在しない。',
+    text_en:"Hasumi's message was never sent. The typing indicator disappeared at 00:41. Thread users kept posting for four hours. Her account never logged on again. The Enshū Railway has no record of any incident on January 8, 2004.",
+    note_ja:'電車の中で他の乗客はまだ眠っていた。\nどこか別の場所でドアが再び開いたとき。\nどれだけ長く走り続けていたのか、誰にもわからなかった。',
+    note_en:'The other passengers were still sleeping when the doors opened again, somewhere else.\nNo one could say how long they had been riding.'
+  });
+}
+
+// ══════════════════════════════════════════════════
+// ── PATH B: GOT OFF ───────────────────────────────
+// ══════════════════════════════════════════════════
+async function pathGotOff(){
+  await H(
+    '看板を見に降りたら——電車が行ってしまいました。ホームにいる間に出発した。一人です。',
+    "I stepped off to look at the sign and — the train left. It left while I was standing on the platform. I'm alone here.",
+    4000
+  );
+
+  await A('はすみ','Hasumi',400);
+  await A('えっ','No',700);
+  await P('ダメだダメだダメだ','no no no no',1000);
+  await A('落ち着いて。周りに何が見えるか全部教えて。','Okay. Breathe. Tell us everything you can see around you.',1800);
+  await A('ずっとここにいるから。書き込み続けて。',"We're here. Keep posting. Don't stop posting.",2500);
+
+  var c4 = await ask([
+    {ja:'ホームはどんな様子？建物は？灯りは？最初から全部教えて。', en:"Start from the beginning — what does the platform look like? Any buildings? Any lights?", bond:+1},
+    {ja:'今すぐ110番に電話して。',                                   en:"Call the police emergency line right now.",                                           bond:0},
+    {ja:'全部写真に撮って。看板、ホーム、周囲全部。',               en:"Take photos of everything — the sign, the platform, the surroundings.",               bond:+1}
+  ]);
+
+  await H(
+    '駅員なし。時刻表なし。券売機なし。看板には「きさらぎ」とだけ書いてあって路線名も前後の駅名もない。出口の外は暗い道と田んぼ。遠くに山。灯りは何もない。親に電話したけど見つからない。警察は「調べます」と言ってたけど信じてもらえなかった気がします。',
+    "No staff. No timetable. No ticket machine. The sign says only KISARAGI — no line name, no adjacent stations listed. Outside the entrance is a dark road and fields. Mountains in the distance. No lights anywhere. Called my parents but they can't find it. Police said they'd look into it. I don't think they believed me.",
+    7000
+  );
+
+  await A('電池は？','How\'s your battery?',700);
+  await A('待合室に公衆電話ない？','Is there a public telephone inside the station building?',1300);
+  await A('線路沿いに歩けば次の駅に出られるかも','Walking along the tracks should lead to another station eventually',1900);
+
+  var c5 = await ask([
+    {ja:'駅の建物の中を丁寧に探して。公衆電話があるかもしれない。', en:"Search the station building carefully — there might be a public telephone.",      bond:+1, id:'phone'},
+    {ja:'線路沿いを歩いて。どこかの駅に出るはず。',                 en:"Walk along the tracks — they have to lead to another station.",                   bond:0,  id:'tracks'},
+    {ja:'ホームで待つ。次の電車が来るはず。',                        en:"Wait on the platform. Another train must come eventually.",                       bond:0,  id:'wait'}
+  ]);
+
+  if(c5.id==='phone' && bond>=5){ await pathPhone(); }
+  else { await pathTracks(c5.id); }
+}
+
+// ══════════════════════════════════════════════════
+// ── PATH: PHONE BOOTH (Good Ending) ───────────────
+// ══════════════════════════════════════════════════
+async function pathPhone(){
+  await H(
+    '待合室の隅に公衆電話がありました！！父に電話しています。',
+    'There IS a public telephone in the corner of the waiting room!! Calling my father now.',
+    5000
+  );
+  await A('よかった！！','YES!! Good!!',600);
+  await A('山の輪郭、道の方向、見える範囲全部説明して','Describe the mountain shapes against the sky, the direction of the road — everything you can see',1200);
+  await wait(4000);
+  await N('8分経過。スレッドが見守っている。','Eight minutes pass. The thread watches.'); await A('。','.',1000);
+  await A('。','.',2000);
+  await A('はすみさん？','Hasumi?',3500);
+  await H(
+    '父がまだ探しています。空の山の形を説明してと言われました。全部伝えています。',
+    'Father is still searching. He asked me to describe the mountain shapes against the sky. I\'m telling him everything I can see.',
+    5500
+  );
+  await wait(5000);
+  await N('さらに14分経過。スレッドはとても静かになった。ただ待っている。','Fourteen more minutes. The thread has gone very quiet. Just waiting.');
+  await A('ここに来てから45分以上経つ',"It's been 45 minutes since she got off the train",1000);
+  await A('ずっとここにいる','Still here',1800);
+  await A('みんなそうだよ','We all are',2500);
+  await H(
+    '道路にヘッドライトが見えます。車。父の車です。今すぐ行きます。',
+    "I can see headlights on the road. A car. It's my father's car. Going right now.",
+    5000
+  );
+  await A('行って！！','GO!!',500);
+  await A('はすみ行けー！！！','HASUMI RUN!!',700);
+  await A('書き込まなくていいから走って！！',"Don't stop to post, just GO!!",1000);
+  await wait(3000);
+  await H(
+    '車の中にいます。安全です。本当にありがとうございました。あなたたちがいなかったら一人でどれほど怖かったか。おやすみなさい。',
+    "I'm in the car. I'm safe. Thank you all so much. I don't know how scared I'd have been without all of you here tonight. Good night.",
+    3500
+  );
+  await A('よかったああああ！！','THANK GOD!!',600);
+  await A('はすみさん！！！','HASUMI!!!',1000);
+  await A('心配してたよ','We were so worried',1500);
+  await A('あの場所、一体なんだったんだろう','What WAS that place',2200);
+  await N('はすみの最後の書き込みは01時09分。スレッドはさらに3日間続いた。',"Hasumi's last post was at 01:09. The thread continued for three more days.");
+
+  await showEnding({
+    type:'good',
+    jp_ja:'生還', jp_en:'Return',
+    text_ja:'はすみの父は当日夜に道を見つけた。翌朝、一人で「きさらぎ駅」を撮影しに戻ったが、もう一度たどり着くことはできなかった。走ったはずの道は、どこにも繋がっていなかった。',
+    text_en:"Hasumi's father found the road that night. The following morning he returned alone to photograph Kisaragi Station. He could not find it again. The road he had driven no longer appeared to connect to anything.",
+    note_ja:'光の中にいなさい。電話を切らないで。\nあなたの名前を知っている人が来るまで待って。',
+    note_en:'Stay in the light. Stay on the phone.\nWait for someone who knows your name.'
+  });
+}
+
+// ══════════════════════════════════════════════════
+// ── PATH: TRACKS ──────────────────────────────════
+// ══════════════════════════════════════════════════
+async function pathTracks(method){
+  var ja_intro = method==='wait'
+    ? '30分待ちましたが電車が来ません。線路沿いに歩くことにします。どこかの駅に出るはず。'
+    : '線路沿いを歩いています。両脇は田んぼです。不思議とスマホの電波があります。電池41%。';
+  var en_intro = method==='wait'
+    ? "Waited 30 minutes. No train came. I'm going to walk the tracks — they have to lead somewhere."
+    : "Walking along the tracks now. Fields on both sides. I still have signal somehow, which is strange. Battery at 41%.";
+  await H(ja_intro, en_intro, 5500);
+
+  await A('線路は進行方向を向いて歩くこと——危ないから','Walk facing oncoming traffic — it\'s safer',700);
+  await A('書き込み続けて。生存確認','Keep posting so we know you\'re moving',1400);
+  await wait(3000);
+  await N('5分間書き込みなし。','Five minutes without a post.');
+  await A('はすみさん？','Hasumi?',2000);
+  await H(
+    'います。歩いてます。前方にトンネルが見えます——線路が山を抜けています。それと、何か聞こえます。後ろの方から。',
+    "Still here. Just walking. There's a tunnel ahead — the tracks go through the mountain. And I can hear something. Behind me.",
+    6500
+  );
+  await A('どんな音？','What kind of sound?',700);
+  await A('鈴？鐘？','A bell? 鈴？鐘？',1200);
+  await A('太鼓と鐘——それ真夜中の山奥で鳴る音じゃない。はすみさん早く歩いて','Bells and drums at 1am in the middle of a mountain — Hasumi please walk faster',1900);
+
+  var c6 = await ask([
+    {ja:'振り返るな。早く歩いて。トンネルへ向かって。', en:"Don't look back. Walk faster. Get to the tunnel.",             bond:+1},
+    {ja:'音をもっと詳しく説明して。大きくなってる？',   en:"Describe the sound more carefully. Is it getting louder?",     bond:0},
+    {ja:'振り返って正面から見て。何が追ってるか知る必要がある。', en:"Turn around and face it. We need to know what's following you.", bond:-1}
+  ]);
+
+  await H(
+    '鐘の音です。ゆっくりした、お葬式みたいな。後ろに太鼓の音も聞こえる。振り返っていません。線路だけ見ています。',
+    "A bell. Slow, like a funeral bell. Drums behind it. I'm not looking back. Keeping my eyes on the tracks ahead.",
+    4000
+  );
+  await A('振り返るな','Don\'t look back',600);
+  await A('歩き続けて','Keep walking',1000);
+  await wait(2000);
+  await H(
+    '線路の上に人がいます。前方に。片足の老人。さっきまでいなかったはずなのに、いつの間にかそこにいる。',
+    "There's a person on the tracks. Ahead of me. An old man with only one leg. He wasn't there a moment ago. I don't know when he appeared.",
+    5500
+  );
+  await A('!!','!!',500);
+  await A('声をかけてみて','Try talking to him',900);
+  await A('真夜中の山の線路に片足の老人…… はすみさん、気をつけて','A one-legged old man on a mountain railway at 1am. Hasumi, please be very careful.',1500);
+  await wait(2500);
+  await H(
+    '誰か聞いたら「ここは安全じゃない」と言いました。帰り方を聞いたらトンネルを指さしました。そして瞬きしたら消えていました。',
+    'I asked who he was. He said: "It\'s not safe here." I asked how to get home. He pointed at the tunnel. Then I blinked and he was gone. Just gone.',
+    6000
+  );
+  await P('片足の霊……日本の民俗調べたくない','A one-legged spirit... I looked up Japanese folklore. You don\'t want to know.',600);
+  await P('調べないで',"Don't look it up",1100);
+  await A('トンネルに入って','Go through the tunnel. He was pointing you toward safety.',1700);
+  await A('入らない方がいい気もする',"Or maybe don't. I genuinely don't know.",2300);
+  await A('はすみさん、直感はどう言ってる？','Hasumi — what does your gut tell you?',3000);
+
+  var c7 = await ask([
+    {ja:'トンネルに入って。あの人はあなたを安全な方向へ指してた。', en:"Go through the tunnel. He was pointing you toward safety.",       bond:+1, id:'tunnel'},
+    {ja:'駅に戻って。電話ボックスがまだ使えるかもしれない。',      en:"Go back to the station. The phone booth might still work.",        bond:0,  id:'back'},
+    {silent:true, bond:-1, id:'silent'}
+  ]);
+
+  if(c7.id==='back'||(c7.silent&&bond<4)){ await pathBackToStation(); }
+  else { await pathTunnel(); }
+}
+
+// ══════════════════════════════════════════════════
+// ── PATH: BACK TO STATION (Good Ending) ───────────
+// ══════════════════════════════════════════════════
+async function pathBackToStation(){
+  var ja = bond>=4
+    ? 'あなたが正しいと思う。あのトンネル、何か嫌な感じがする。駅に戻ります。'
+    : '入れない。駅に戻ります。';
+  var en = bond>=4
+    ? "I think you're right. Something feels wrong about that tunnel. Going back to the station."
+    : "I can't go in there. Going back.";
+  await H(ja, en, 4000);
+  await N('戻る。鐘の音は追ってこない。',"She walks back. The bell-sound does not follow.");
+  await H(
+    'さっき見落としていた公衆電話がありました。駅の中に。発信できます。父に電話しています。',
+    "I found a phone booth I missed before. Inside the station. It has a dial tone. Calling my father.",
+    6000
+  );
+  await A('やった！！','YES!!',500);
+  await A('山の形、道の方向、全部伝えて','Tell him the mountain shapes, the direction of the road, everything',1100);
+  await wait(8000);
+  await N('47分経過。スレッドは静かに待っている。','Forty-seven minutes pass. The thread keeps a quiet vigil.');
+  await A('まだいる','Still here',1200);
+  await A('ここにいるよ',"We're here",2000);
+  await H(
+    '父が道を見つけました。ヘッドライトが見えます。迎えに来てくれました。行きます。ありがとうございました。',
+    "My father found the road. I can see his headlights. He's here. I'm leaving. Thank you all so much.",
+    5000
+  );
+  await A('はすみさん！！！','HASUMI!!!',500);
+  await A('よかった','She made it',1000);
+  await A('本当によかった……','Thank god',1700);
+
+  await showEnding({
+    type:'good',
+    jp_ja:'生還', jp_en:'Return',
+    text_ja:'はすみの父は01時13分に到着した。翌日の午後、自宅から「無事です」と一度だけ書き込みがあった。線路で聞いた音については、二度と触れなかった。スレッドは翌週にアーカイブされた。',
+    text_en:"Hasumi's father arrived at 01:13. She posted once from home the next afternoon to say she was fine. She never mentioned what she heard on the tracks. The thread was archived the following week.",
+    note_ja:'引き返すという感覚を信じて。\n迎えに来てくれる人を信じて。',
+    note_en:'Trust the feeling that says turn back.\nTrust the person who drives through the dark to find you.'
+  });
+}
+
+// ══════════════════════════════════════════════════
+// ── PATH: TUNNEL ──────────────────────────────────
+// ══════════════════════════════════════════════════
+async function pathTunnel(){
+  await H(
+    'トンネルに入ります。スマホのライト点けました。電池29%。出口が見えません。',
+    "Going into the tunnel. Phone light on. Battery at 29%. I can't see the other end yet.",
+    5000
+  );
+  await A('歩きながら書き込んで。生きてるか確認したい','Keep posting from inside so we know you\'re moving',700);
+  await A('ただ歩いて','Just keep walking',1300);
+  await wait(4000);
+  await N('3分間、書き込みなし。スレッドがざわつく。','Three minutes without a post. The thread gets anxious.');
+  await A('はすみさん？','Hasumi?',1500);
+  await A('……','......',2500);
+  await H(
+    'います。長いトンネル。とても静か。出口が見えてきました。向こう側に小さなホームがある。',
+    "Still here. Long tunnel. Very quiet. I can see the exit now. There's a small platform on the other side.",
+    5500
+  );
+  await A('別の駅？','Another station?',700);
+  await A('誰かいる？','Is there anyone there?',1200);
+  await H(
+    'ホームに男の人が立っています。手を振っています。「この辺り知ってる、ちゃんとした駅まで車で送ろうか」と言っています。田中という名前だそうです。笑顔で、ホームの後ろに車があります。',
+    "A man is standing on the platform. He's waving. He says he knows this area and can drive me to a proper station. His name is Tanaka. He's smiling. There's a car parked behind the platform building.",
+    6500
+  );
+  await A('<span class="warn">その車に乗るな！！</span>','<span class="warn">DO NOT GET IN THAT CAR!!</span>',500);
+  await A('なんでこの男がここにいるんだ','How did he know you\'d come through that tunnel',900);
+  await A('でもはすみさんもう何時間もそこにいる……',"But she's been out there for hours...",1300);
+  await A('<span class="warn">絶対に車に乗るな！！はすみ！！！</span>','<span class="warn">HASUMI DO NOT GET IN THE CAR</span>',1700);
+  await A('なんでそんなところにトンネルが来ることを知ってたんだこの男','Why is he already there. How did he know.',2100);
+  await A('その笑顔が気持ち悪い','That smile is wrong',2600);
+
+  var c8 = await ask([
+    {ja:'絶対に乗らないで。家族はもうあなたの居場所を知ってると伝えて。',    en:"Do NOT get in his car. Tell him your family already knows your location.",              bond:+1, id:'refuse'},
+    {ja:'フルネームを聞いて、警察に伝えてから何もしないで。',                en:"Ask for his full name and call the police with his details before going anywhere.",       bond:+1, id:'verify'},
+    {ja:'乗って。もう十分長くそこにいる。',                                    en:"Get in. You've been out there long enough.",                                               bond:-2, danger:true, id:'go'},
+    {silent:true, bond:-1, id:'silent'}
+  ]);
+
+  var refuseOpt=(c8.id==='refuse'||c8.id==='verify');
+  if(refuseOpt&&bond>=6){ await pathRefuse(c8.id); }
+  else if(refuseOpt&&bond<6){ await pathRefuseLowBond(); }
+  else { await pathDisappear(); }
+}
+
+// ── Refused but bond too low — she scares him off but finds her own way ──
+async function pathRefuseLowBond(){
+  await H(
+    '「まず警察に電話します」と伝えました。男がすごく静かになって……車に乗って走り去りました。何も言わずに。',
+    "I said I'd call the police first. He went very quiet. Then he just got in his car and drove away without saying a word.",
+    5000
+  );
+  await A('逃げた！？','He just LEFT??',600);
+  await A('それ絶対に普通の人じゃない','That is NOT a normal person',1100);
+  await H(
+    '道路があります。ちゃんとしたアスファルト。遠くに建物の灯りが見えます。歩いていきます。電池12%。',
+    "There's a real road here. Proper asphalt. I can see building lights in the distance. Going there now. Battery at 12%.",
+    5000
+  );
+  await A('行って！！','YES go to the lights!!',600);
+  await wait(5000);
+  await N('22分間、書き込みなし。','Twenty-two minutes without a post.');
+  await H(
+    'コンビニにいます。セブンイレブン。ここがどこか店員さんに聞きました。浜松の北西、山の中とのことです。親が来てくれます。助かりました。本当にありがとうございました。',
+    "I'm at a 7-Eleven. The clerk told me where I am — northwest of Hamamatsu, in the mountains. My parents are coming. I'm safe. Thank you all so much.",
+    4000
+  );
+  await A('はすみさん！！！','HASUMI!!!',500);
+  await A('よかった……','She made it',1200);
+
+  await showEnding({
+    type:'good',
+    jp_ja:'生存', jp_en:'Survivor',
+    text_ja:'はすみは01時31分にセブンイレブンへたどり着いた。20分後に両親が到着した。帰宅後に一度「おやすみなさい」と書き込んだ。スレッドはさらに5日間続き、1847レスでアーカイブされた。',
+    text_en:"Hasumi reached the 7-Eleven at 01:31. Her parents arrived twenty minutes later. She posted once from home to say goodnight. The thread archived at 1,847 replies.",
+    note_ja:'本能がうまく守ってくれることがある、\nたとえ失敗しているように感じていても。',
+    note_en:"Sometimes your instincts protect you\neven when you think they're failing."
+  });
+}
+
+// ── True Ending ────────────────────────────────────
+async function pathRefuse(method){
+  var ja = method==='verify'
+    ? '「名前を警察に伝えます」と言いました。男が完全に黙り込んで——笑顔が消えて——そのまま車に乗って走り去りました。一言も言わずに。'
+    : '「家族はもう私の居場所を知っています。警察にも連絡済みです」と言いました。しばらく私を見ていましたが、車に乗って何も言わずに去りました。';
+  var en = method==='verify'
+    ? "I told him I'd give his name to the police. He went completely silent. The smile disappeared. He got in his car and drove away without a single word."
+    : "I told him my family already knows where I am and I've spoken to the police. He looked at me for a moment. Got in his car and left. No argument. Just gone.";
+  await H(ja, en, 5500);
+  await A('そんなに早く帰ったの！？','He left that fast??',600);
+  await A('普通の人はそんな反応しない','Normal people don\'t react like that',1100);
+  await A('よかった。本当によかった。','Good. That was the right call.',1600);
+  await H(
+    'ちゃんとしたアスファルトの道があります。1kmくらい先に建物の灯りが見える。歩きます。電池11%。電池切れで途切れても大丈夫です。',
+    "There's a real road. I can see building lights maybe 1km away. I'm going to walk toward them. Battery at 11%. If I go quiet it's just the battery dying.",
+    6000
+  );
+  await A('行って。止まらないで。ここで待ってる。','Go. Don\'t stop. We\'ll wait here.',700);
+  await N('29分間、書き込みなし。スレッドが待つ。誰一人去らない。','Twenty-nine minutes of silence. The thread waits. Nobody leaves.');
+  await A('……','......',1000);
+  await A('電池切れなだけだよ','Just the battery',2000);
+  await A('大丈夫なはず','She has to be okay',3000);
+  await A('。','.',4500);
+  await H(
+    'コンビニにいます。セブンイレブン。浜松の北西、山の中だそうです。あったかいお茶飲んでいます。親が来ます。少し泣きそうです。',
+    "I'm at a 7-Eleven. Northwest of Hamamatsu, in the mountains. Getting warm tea. My parents are on their way. I think I'm going to cry a little.",
+    5000
+  );
+  await A('はすみ','Hasumi',500);
+  await A('よかった','Thank god',800);
+  await A('よかったよ','Thank god',1000);
+  await A('ずっとここにいたよ','We stayed the whole time',1500);
+  await A('逃がすわけがないじゃないか',"We weren't going to leave you",2000);
+  await H(
+    'わかってた。ずっと感じてたよ。あなたたちがいなかったら今夜取り返しのつかないことをしてたかもしれない。あの場所がどんな場所なのかわからない。でも助かった。おやすみなさい。',
+    "I knew. I could feel it the whole time. Without all of you I might have made a terrible mistake tonight. I don't know what that place was. But I'm safe. Good night.",
+    7000
+  );
+  await A('おやすみ、はすみ','Good night, Hasumi',700);
+  await A('おやすみ','Good night',1400);
+  await A('おやすみ','Good night',2200);
+  await A('おやすみ','Good night',3500);
+
+  await showEnding({
+    type:'true',
+    jp_ja:'生き残り', jp_en:'Survived',
+    text_ja:'はすみの両親は01時47分に迎えに来た。その夜スレッドを去り、二度と戻ってこなかった。一年後、同じスレッドのログに差出人不明のメッセージが見つかった。「遅い電車に乗るとまだ鈴の音がすることがある。でも大丈夫です。笑顔の男の車には乗らないでください。スレッドに残ってくれる人を信じて。」',
+    text_en:"Hasumi's parents found her at the 7-Eleven at 01:47. She left the thread that night and never returned. One year later, an unsigned message appeared in the thread archive: \"I still hear the bell sometimes on late trains. But I'm okay. Don't get in the car with the man who smiles. Trust the people who stay in the thread.\"",
+    note_ja:'片足の老人は正確なタイミングで線路に現れた。\n誰もこれを説明できなかった。\n暗闇の中にいるものが全て、あなたを傷つけようとしているわけではない。',
+    note_en:"The one-legged man appeared at exactly the right moment.\nNo one could explain it.\nNot everything in the dark is trying to hurt you."
+  });
+}
+
+// ── Bad Ending B: Disappeared ──────────────────────
+async function pathDisappear(){
+  var ja = bond<=3
+    ? '大丈夫そうです。乗ります。電池本当にやばいので途切れるかも。車の中から更新します。'
+    : '——わかった。乗ります。更新できる限りします。';
+  var en = bond<=3
+    ? "He seems okay. I'm getting in. Battery is really low so I might lose signal. Will update from the car."
+    : "...okay. I'm getting in. I'll update when I can.";
+  await H(ja, en, 4000);
+  await P('はすみ待って！！','HASUMI WAIT!!',400);
+  await P('乗るな！！',"DON'T GET IN",600);
+  await A('お願いだから',"Please don't",900);
+  await wait(7000);
+  startSilence();
+  await P('はすみさん？','Hasumi?',1800);
+  await P('更新して','Update us',3000);
+  await P('はすみ！！','HASUMI!!',4500);
+  await P('8分間音沙汰ない',"It's been 8 minutes",6500);
+  await P('。','.',8000);
+  await P('。','.',9500);
+  await P('はすみお願い','Hasumi please',11000);
+  await P('はすみさん大丈夫ですか！？','HASUMI ARE YOU OKAY',13500);
+  await P('どこにいるの','Where are you',15500);
+  await P('……','......',18000);
+  await P('スレ死んだ','Thread is dead',21000);
+
+  await showEnding({
+    type:'bad',
+    jp_ja:'失踪', jp_en:'Disappeared',
+    text_ja:'はすみの最後の書き込みは01時19分だった。彼女は見つからなかった。家族は2004年1月9日に捜索願を提出した。遠州鉄道に列車事故の記録はない。該当する田中という人物も存在しない。きさらぎ駅も存在しない。',
+    text_en:"Hasumi's last post was at 01:19. She was never found. Her family filed a missing persons report on January 9, 2004. The Enshū Railway has no record of any train incident. There is no Tanaka registered in the area. There is no Kisaragi Station.",
+    note_ja:'車に乗るな。\n車に乗るな。\n車に乗るな。',
+    note_en:'Do not get in the car.\nDo not get in the car.\nDo not get in the car.'
+  });
+}
+</script>
+</body>
+</html>
